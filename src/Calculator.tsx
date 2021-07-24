@@ -52,6 +52,7 @@ interface Calculations {
 
 export default function Calculator() {
   const classes = useStyles();
+  const showTips = false;
   const defaultFormInputs: RawFormInputs = {
     currentAge: "21",
     retirementAge: "65",
@@ -139,7 +140,9 @@ export default function Calculator() {
                 className={classes.wider}
                 label={"Age you would like to retire by"}
                 helperText={
-                  "Your actual retirement may be sooner or later based on your financials"
+                  showTips
+                    ? "Your actual retirement may be sooner or later based on your financials"
+                    : ""
                 }
                 value={inputs.retirementAge}
                 onChange={(event) => {
@@ -165,7 +168,9 @@ export default function Calculator() {
                 className={classes.wider}
                 label={"Current value of portfolio ($)"}
                 helperText={
-                  "Including stocks, bonds, mutual funds, ETFs, etc. Not including investment properties."
+                  showTips
+                    ? "Including stocks, bonds, mutual funds, ETFs, etc. Not including investment properties."
+                    : ""
                 }
                 value={inputs.currentPortfolio}
                 onChange={(event) => {
@@ -181,7 +186,9 @@ export default function Calculator() {
                 className={classes.wider}
                 label={"Annual contribution to portfolio ($)"}
                 helperText={
-                  "How much you could save each year assuming your income and expenses were static"
+                  showTips
+                    ? "How much you could save each year assuming your income and expenses were static"
+                    : ""
                 }
                 value={inputs.annualPortfolioContribution}
                 onChange={(event) => {
@@ -197,7 +204,9 @@ export default function Calculator() {
                 className={classes.wider}
                 label={"Annual expenses in retirement ($)"}
                 helperText={
-                  "How much you expect to spend per year in retirement assuming your expenses were static"
+                  showTips
+                    ? "How much you expect to spend per year in retirement assuming your expenses were static"
+                    : ""
                 }
                 value={inputs.annualRetirementExpenses}
                 onChange={(event) => {
@@ -221,7 +230,9 @@ export default function Calculator() {
                 className={classes.wider}
                 label={"Annual real return of portfolio (%)"}
                 helperText={
-                  "This will vary but over a long period of time it will typically average 4-7%"
+                  showTips
+                    ? "This will vary but over a long period of time it will typically average 4-7%"
+                    : ""
                 }
                 value={inputs.annualReturnRate}
                 onChange={(event) => {
@@ -237,7 +248,9 @@ export default function Calculator() {
                 className={classes.wider}
                 label={"Annual withdrawal rate in retirement (%)"}
                 helperText={
-                  "Percentage of the portfolio that will be withdrawn to meet your retirement expenses, typically 3-4%"
+                  showTips
+                    ? "Percentage of the portfolio that will be withdrawn to meet your retirement expenses, typically 3-4%"
+                    : ""
                 }
                 value={inputs.annualWithdrawalRate}
                 onChange={(event) => {
