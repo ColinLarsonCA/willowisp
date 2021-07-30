@@ -1,15 +1,21 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
+  Divider,
   Grid,
+  IconButton,
+  InputAdornment,
+  Snackbar,
   TextField,
   Typography,
 } from "@material-ui/core";
+import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 
 const useStyles = makeStyles((theme) => ({
   wider: {
@@ -17,6 +23,13 @@ const useStyles = makeStyles((theme) => ({
   },
   separator: {
     height: theme.spacing(2),
+  },
+  summaryContainer: {
+    width: "100%",
+  },
+  summaryDivider: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
 }));
 
@@ -50,30 +63,55 @@ interface Calculations {
   percentOfRetirementPortfolio: number;
 }
 
-export default function Calculator() {
+export interface CalculatorProps {
+  encodedInputData?: string;
+}
+
+interface CurrentAlert {
+  open: boolean;
+  message?: string;
+  severity?: "success" | "info" | "warning" | "error";
+}
+
+export default function Calculator(props: CalculatorProps) {
   const classes = useStyles();
-  const showTips = false;
   const defaultFormInputs: RawFormInputs = {
     currentAge: "21",
     retirementAge: "65",
-    currentPortfolio: "0",
+    currentPortfolio: "0.00",
     annualPortfolioContribution: "12000.00",
     annualRetirementExpenses: "30000.00",
     annualReturnRate: "4.00",
     annualWithdrawalRate: "3.50",
   };
-  const [inputs, setInputs] = useState(defaultFormInputs);
+  const [inputs, setInputs] = useState(() => {
+    if (props.encodedInputData) {
+      try {
+        const jsonInputData = atob(props.encodedInputData);
+        return JSON.parse(jsonInputData) as RawFormInputs;
+      } catch (e) {
+        console.error("something went wrong while decoding: " + e);
+      }
+    }
+    return defaultFormInputs;
+  });
+  const [currentAlert, setCurrentAlert] = useState<CurrentAlert>({
+    open: false,
+  });
+  const showTips = false;
   const results: Calculations = useMemo(() => {
     const v: Inputs = {
-      currentAge: parseInt(inputs.currentAge), //C2
-      retirementAge: parseInt(inputs.retirementAge), //C8
-      currentPortfolio: parseFloat(inputs.currentPortfolio), //C3
+      currentAge: parseInt(inputs.currentAge || "0"), //C2
+      retirementAge: parseInt(inputs.retirementAge || "0"), //C8
+      currentPortfolio: parseFloat(inputs.currentPortfolio || "0.00"), //C3
       annualPortfolioContribution: parseFloat(
-        inputs.annualPortfolioContribution
+        inputs.annualPortfolioContribution || "0.00"
       ), //C4
-      annualRetirementExpenses: parseFloat(inputs.annualRetirementExpenses), //C6
-      annualReturnRate: parseFloat(inputs.annualReturnRate), //C5
-      annualWithdrawalRate: parseFloat(inputs.annualWithdrawalRate), //C7
+      annualRetirementExpenses: parseFloat(
+        inputs.annualRetirementExpenses || "0.00"
+      ), //C6
+      annualReturnRate: parseFloat(inputs.annualReturnRate || "0.00"), //C5
+      annualWithdrawalRate: parseFloat(inputs.annualWithdrawalRate || "0.00"), //C7
     };
     const requiredPortfolio =
       v.annualRetirementExpenses / (v.annualWithdrawalRate / 100.0);
@@ -114,6 +152,26 @@ export default function Calculator() {
     style: "currency",
     currency: "USD",
   });
+  const copyLink = useCallback(() => {
+    const encoded = btoa(JSON.stringify(inputs));
+    const url = `http://localhost:3000/?data=${encoded}`;
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        setCurrentAlert({
+          open: true,
+          message: "Link copied to clipboard!",
+          severity: "success",
+        });
+      })
+      .catch(() => {
+        setCurrentAlert({
+          open: true,
+          message: "Failed to copy link to clipboard",
+          severity: "error",
+        });
+      });
+  }, [inputs]);
   return (
     <Box>
       <Accordion defaultExpanded={true}>
@@ -129,6 +187,7 @@ export default function Calculator() {
               <TextField
                 className={classes.wider}
                 label={"Current age"}
+                placeholder={"0"}
                 value={inputs.currentAge}
                 onChange={(event) => {
                   setInputs({ ...inputs, currentAge: event.target.value });
@@ -139,6 +198,7 @@ export default function Calculator() {
               <TextField
                 className={classes.wider}
                 label={"Age you would like to retire by"}
+                placeholder={"0"}
                 helperText={
                   showTips
                     ? "Your actual retirement may be sooner or later based on your financials"
@@ -166,7 +226,13 @@ export default function Calculator() {
             <Grid item xs={12} md={5}>
               <TextField
                 className={classes.wider}
-                label={"Current value of portfolio ($)"}
+                label={"Current value of portfolio"}
+                placeholder={"0.00"}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  ),
+                }}
                 helperText={
                   showTips
                     ? "Including stocks, bonds, mutual funds, ETFs, etc. Not including investment properties."
@@ -184,7 +250,13 @@ export default function Calculator() {
             <Grid item xs={12} md={5}>
               <TextField
                 className={classes.wider}
-                label={"Annual contribution to portfolio ($)"}
+                label={"Annual contribution to portfolio"}
+                placeholder={"0.00"}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  ),
+                }}
                 helperText={
                   showTips
                     ? "How much you could save each year assuming your income and expenses were static"
@@ -202,7 +274,13 @@ export default function Calculator() {
             <Grid item xs={12} md={5}>
               <TextField
                 className={classes.wider}
-                label={"Annual expenses in retirement ($)"}
+                label={"Annual expenses in retirement"}
+                placeholder={"0.00"}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  ),
+                }}
                 helperText={
                   showTips
                     ? "How much you expect to spend per year in retirement assuming your expenses were static"
@@ -228,7 +306,13 @@ export default function Calculator() {
             <Grid item xs={12} md={5}>
               <TextField
                 className={classes.wider}
-                label={"Annual real return of portfolio (%)"}
+                label={"Annual real return of portfolio"}
+                placeholder={"0.00"}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">%</InputAdornment>
+                  ),
+                }}
                 helperText={
                   showTips
                     ? "This will vary but over a long period of time it will typically average 4-7%"
@@ -246,7 +330,13 @@ export default function Calculator() {
             <Grid item xs={12} md={5}>
               <TextField
                 className={classes.wider}
-                label={"Annual withdrawal rate in retirement (%)"}
+                label={"Annual withdrawal rate in retirement"}
+                placeholder={"0.00"}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">%</InputAdornment>
+                  ),
+                }}
                 helperText={
                   showTips
                     ? "Percentage of the portfolio that will be withdrawn to meet your retirement expenses, typically 3-4%"
@@ -277,7 +367,12 @@ export default function Calculator() {
             </Typography>
           )}
           {!results.anyNaNs && (
-            <div>
+            <div className={classes.summaryContainer}>
+              <IconButton onClick={copyLink}>
+                <FileCopyIcon />
+              </IconButton>
+              Copy a link
+              <Divider className={classes.summaryDivider} />
               <Typography>
                 {results.isRetirementPossibleByTargetAge
                   ? `Congratulations, you're on track to retire by ${inputs.retirementAge}! 🎉`
@@ -304,6 +399,22 @@ export default function Calculator() {
           )}
         </AccordionDetails>
       </Accordion>
+      <Snackbar
+        open={currentAlert.open}
+        autoHideDuration={6000}
+        onClose={() => setCurrentAlert({ open: false })}
+      >
+        <Alert
+          severity={currentAlert.severity}
+          onClose={() => setCurrentAlert({ open: false })}
+        >
+          {currentAlert.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
+}
+
+function Alert(props: AlertProps) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
 }

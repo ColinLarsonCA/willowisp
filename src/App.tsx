@@ -13,12 +13,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function App() {
+  const params = new URLSearchParams(window.location.search);
+  const dataParam = params.get("data");
   const classes = useStyles();
   return (
     <div>
       <Header />
       <Box className={classes.content}>
-        <Calculator />
+        <Calculator encodedInputData={dataParam || undefined} />
       </Box>
     </div>
   );

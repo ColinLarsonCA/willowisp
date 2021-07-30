@@ -34,7 +34,7 @@ export default function Header() {
             <WhatshotIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            Retirement Calculator
+            Retirement Forecasting
           </Typography>
         </Toolbar>
       </AppBar>
