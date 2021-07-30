@@ -154,7 +154,7 @@ export default function Calculator(props: CalculatorProps) {
   });
   const copyLink = useCallback(() => {
     const encoded = btoa(JSON.stringify(inputs));
-    const url = `http://localhost:3000/?data=${encoded}`;
+    const url = `${window.location.href}?data=${encoded}`;
     navigator.clipboard
       .writeText(url)
       .then(() => {
