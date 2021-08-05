@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -73,6 +73,8 @@ interface CurrentAlert {
   severity?: "success" | "info" | "warning" | "error";
 }
 
+const cacheKey = "retirement_forecasting_inputs";
+
 export default function Calculator(props: CalculatorProps) {
   const classes = useStyles();
   const defaultFormInputs: RawFormInputs = {
@@ -85,16 +87,23 @@ export default function Calculator(props: CalculatorProps) {
     annualWithdrawalRate: "3.50",
   };
   const [inputs, setInputs] = useState(() => {
-    if (props.encodedInputData) {
+    const encodedInputData = props.encodedInputData;
+    const cachedInputData = localStorage.getItem(cacheKey);
+    if (encodedInputData) {
       try {
-        const jsonInputData = atob(props.encodedInputData);
+        const jsonInputData = atob(encodedInputData);
         return JSON.parse(jsonInputData) as RawFormInputs;
       } catch (e) {
         console.error("something went wrong while decoding: " + e);
       }
+    } else if (cachedInputData) {
+      return JSON.parse(cachedInputData) as RawFormInputs;
     }
     return defaultFormInputs;
   });
+  useEffect(() => {
+    localStorage.setItem(cacheKey, JSON.stringify(inputs));
+  }, [inputs]);
   const [currentAlert, setCurrentAlert] = useState<CurrentAlert>({
     open: false,
   });
