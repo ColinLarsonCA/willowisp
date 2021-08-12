@@ -16,6 +16,8 @@ import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
+import { calculateInvestmentGrowth, InvestmentGrowth, pct } from "./math";
+import GrowthGraph from "./GrowthGraph";
 
 const useStyles = makeStyles((theme) => ({
   wider: {
@@ -61,6 +63,7 @@ interface Calculations {
   possibleRetirementAge: number;
   retirementAgeDifference: number;
   percentOfRetirementPortfolio: number;
+  investmentGrowth: InvestmentGrowth[];
 }
 
 export interface CalculatorProps {
@@ -108,23 +111,27 @@ export default function Calculator(props: CalculatorProps) {
     open: false,
   });
   const showTips = false;
-  const results: Calculations = useMemo(() => {
+  const convertedInputs = useMemo(() => {
     const v: Inputs = {
-      currentAge: parseInt(inputs.currentAge || "0"), //C2
-      retirementAge: parseInt(inputs.retirementAge || "0"), //C8
-      currentPortfolio: parseFloat(inputs.currentPortfolio || "0.00"), //C3
+      currentAge: parseInt(inputs.currentAge || "0"),
+      retirementAge: parseInt(inputs.retirementAge || "0"),
+      currentPortfolio: parseFloat(inputs.currentPortfolio || "0.00"),
       annualPortfolioContribution: parseFloat(
         inputs.annualPortfolioContribution || "0.00"
-      ), //C4
+      ),
       annualRetirementExpenses: parseFloat(
         inputs.annualRetirementExpenses || "0.00"
-      ), //C6
-      annualReturnRate: parseFloat(inputs.annualReturnRate || "0.00"), //C5
-      annualWithdrawalRate: parseFloat(inputs.annualWithdrawalRate || "0.00"), //C7
+      ),
+      annualReturnRate: parseFloat(inputs.annualReturnRate || "0.00"),
+      annualWithdrawalRate: parseFloat(inputs.annualWithdrawalRate || "0.00"),
     };
+    return v;
+  }, [inputs]);
+  const results: Calculations = useMemo(() => {
+    const v = convertedInputs;
     const requiredPortfolio =
-      v.annualRetirementExpenses / (v.annualWithdrawalRate / 100.0);
-    const lnReturnRate = Math.log(1 + v.annualReturnRate / 100.0);
+      v.annualRetirementExpenses / pct(v.annualWithdrawalRate);
+    const lnReturnRate = Math.log(1 + pct(v.annualReturnRate));
     const firstNumerator =
       v.annualPortfolioContribution + requiredPortfolio * lnReturnRate;
     const firstDenominator =
@@ -154,9 +161,10 @@ export default function Calculator(props: CalculatorProps) {
       possibleRetirementAge,
       retirementAgeDifference,
       percentOfRetirementPortfolio,
+      investmentGrowth: calculateInvestmentGrowth(v.currentAge, v.retirementAge, v.currentPortfolio, v.annualPortfolioContribution, v.annualReturnRate)
     };
     return calculatedResults;
-  }, [inputs]);
+  }, [convertedInputs]);
   const dollars = Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -226,11 +234,6 @@ export default function Calculator(props: CalculatorProps) {
 
             <Grid item xs={12}>
               <Typography>Financials</Typography>
-              <Typography variant={"caption"}>
-                The model accounts for typical inflation rates - so values
-                should be entered as snapshots of the current year or the first
-                year of retirement
-              </Typography>
             </Grid>
             <Grid item xs={12} md={5}>
               <TextField
@@ -392,7 +395,7 @@ export default function Calculator(props: CalculatorProps) {
                   results.possibleRetirementAge
                 )}, that's ${Math.floor(
                   Math.abs(results.retirementAgeDifference)
-                )} years before you planned to.`}
+                )} years ${results.retirementAgeDifference < 0 ? 'before' : 'after'} you planned to.`}
               </Typography>
               <Typography>
                 {`Based on your retirement needs, you'll need to save at least ${dollars.format(
@@ -404,6 +407,9 @@ export default function Calculator(props: CalculatorProps) {
                   2
                 )}% of what you need to retire. Keep it up!`}
               </Typography>
+              <div style={{height: 500}}>
+                <GrowthGraph investmentGrowth={results.investmentGrowth} />
+              </div>
             </div>
           )}
         </AccordionDetails>
