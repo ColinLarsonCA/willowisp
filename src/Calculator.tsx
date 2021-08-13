@@ -115,7 +115,9 @@ export default function Calculator(props: CalculatorProps) {
     return defaultFormInputs;
   });
   useEffect(() => {
-    localStorage.setItem(cacheKey, JSON.stringify(inputs));
+    if (!props.encodedInputData) {
+      localStorage.setItem(cacheKey, JSON.stringify(inputs));
+    }
   }, [inputs]);
   const [currentAlert, setCurrentAlert] = useState<CurrentAlert>({
     open: false,
