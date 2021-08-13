@@ -4,9 +4,9 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Chip,
   Divider,
   Grid,
-  IconButton,
   InputAdornment,
   Snackbar,
   TextField,
@@ -18,10 +18,12 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import { calculateInvestmentGrowth, InvestmentGrowth, pct } from "./math";
 import GrowthGraph from "./GrowthGraph";
+import { parseAndShortHandDollars } from "./formatting";
 
 const useStyles = makeStyles((theme) => ({
   wider: {
-    width: "300px",
+    maxWidth: "300px",
+    width: "100%",
   },
   separator: {
     height: theme.spacing(2),
@@ -29,9 +31,17 @@ const useStyles = makeStyles((theme) => ({
   summaryContainer: {
     width: "100%",
   },
-  summaryDivider: {
+  resultsDivider: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
+  },
+  resultsContainer: {
+    paddingTop: theme.spacing(2),
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+  },
+  informationSubtitle: {
+    color: theme.palette.text.secondary,
   },
 }));
 
@@ -161,7 +171,13 @@ export default function Calculator(props: CalculatorProps) {
       possibleRetirementAge,
       retirementAgeDifference,
       percentOfRetirementPortfolio,
-      investmentGrowth: calculateInvestmentGrowth(v.currentAge, v.retirementAge, v.currentPortfolio, v.annualPortfolioContribution, v.annualReturnRate)
+      investmentGrowth: calculateInvestmentGrowth(
+        v.currentAge,
+        Math.min(v.retirementAge, 100),
+        v.currentPortfolio,
+        v.annualPortfolioContribution,
+        v.annualReturnRate
+      ),
     };
     return calculatedResults;
   }, [convertedInputs]);
@@ -193,7 +209,22 @@ export default function Calculator(props: CalculatorProps) {
     <Box>
       <Accordion defaultExpanded={true}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Your information</Typography>
+          <Grid container spacing={1}>
+            <Grid item>
+              <Typography>Your information</Typography>
+            </Grid>
+            <Grid item>
+              <Typography className={classes.informationSubtitle}>
+                {inputs.currentAge}→{inputs.retirementAge} —{" "}
+                {parseAndShortHandDollars(inputs.currentPortfolio)}+
+                <span style={{ textDecoration: "overline" }}>
+                  {parseAndShortHandDollars(inputs.annualPortfolioContribution)}
+                </span>{" "}
+                compounding at {inputs.annualReturnRate}% and withdrawn at{" "}
+                {inputs.annualWithdrawalRate}%
+              </Typography>
+            </Grid>
+          </Grid>
         </AccordionSummary>
         <AccordionDetails>
           <Grid container justifyContent={"flex-start"} spacing={1}>
@@ -367,53 +398,61 @@ export default function Calculator(props: CalculatorProps) {
         </AccordionDetails>
       </Accordion>
 
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Summary</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {results.anyNaNs && (
-            <Typography>
-              Looks like there were some problems calculating, check for any
-              errors in the information you provided
+      <div className={classes.resultsContainer}>
+        {results.anyNaNs && (
+          <Typography>
+            Looks like there were some problems calculating, check for any
+            errors in the information you provided
+          </Typography>
+        )}
+        {!results.anyNaNs && (
+          <div className={classes.summaryContainer}>
+            <Chip
+              icon={<FileCopyIcon />}
+              label="Share these results"
+              clickable
+              color="primary"
+              onClick={copyLink}
+            />
+            <Divider className={classes.resultsDivider} />
+            <Typography variant="h6">
+              {results.isRetirementPossibleByTargetAge
+                ? `Congratulations, you're on track to retire by ${inputs.retirementAge}! 🎉`
+                : `Uh oh, it doesn't look like you're going to reach your retirement goal. You'll have to find ways to save more or adjust your expectations to meet it.`}
             </Typography>
-          )}
-          {!results.anyNaNs && (
-            <div className={classes.summaryContainer}>
-              <IconButton onClick={copyLink}>
-                <FileCopyIcon />
-              </IconButton>
-              Copy a link
-              <Divider className={classes.summaryDivider} />
-              <Typography>
-                {results.isRetirementPossibleByTargetAge
-                  ? `Congratulations, you're on track to retire by ${inputs.retirementAge}! 🎉`
-                  : `Uh oh, it doesn't look like you're going to reach your retirement goal. You'll have to find ways to save more or adjust your expectations to meet it.`}
-              </Typography>
-              <Typography>
-                {`It looks like you'll be able to retire by ${Math.ceil(
-                  results.possibleRetirementAge
-                )}, that's ${Math.floor(
-                  Math.abs(results.retirementAgeDifference)
-                )} years ${results.retirementAgeDifference < 0 ? 'before' : 'after'} you planned to.`}
-              </Typography>
-              <Typography>
-                {`Based on your retirement needs, you'll need to save at least ${dollars.format(
-                  results.requiredPortfolio
-                )}.`}
-              </Typography>
-              <Typography>
-                {`So far you've saved ${results.percentOfRetirementPortfolio.toFixed(
-                  2
-                )}% of what you need to retire. Keep it up!`}
-              </Typography>
-              <div style={{height: 500}}>
-                <GrowthGraph investmentGrowth={results.investmentGrowth} />
-              </div>
+            <br />
+            <Typography>
+              {`It looks like you'll be able to retire by ${Math.ceil(
+                results.possibleRetirementAge
+              )}, that's ${Math.floor(
+                Math.abs(results.retirementAgeDifference)
+              )} years ${
+                results.retirementAgeDifference < 0 ? "before" : "after"
+              } you planned to.`}
+            </Typography>
+            <Typography>
+              {`Based on your retirement needs, you'll need to save at least ${dollars.format(
+                results.requiredPortfolio
+              )}.`}
+            </Typography>
+            <Typography>
+              {`So far you've saved ${results.percentOfRetirementPortfolio.toFixed(
+                2
+              )}% of what you need to retire. Keep it up!`}
+            </Typography>
+            <Divider className={classes.resultsDivider} />
+            <Typography variant="h6">
+              How your investment could grow over time
+            </Typography>
+            <div style={{ height: 500 }}>
+              <GrowthGraph
+                investmentGrowth={results.investmentGrowth}
+                requiredPortfolio={results.requiredPortfolio}
+              />
             </div>
-          )}
-        </AccordionDetails>
-      </Accordion>
+          </div>
+        )}
+      </div>
       <Snackbar
         open={currentAlert.open}
         autoHideDuration={6000}
