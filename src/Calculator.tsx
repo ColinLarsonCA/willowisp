@@ -19,6 +19,7 @@ import FileCopyIcon from "@material-ui/icons/FileCopy";
 import { calculateInvestmentGrowth, InvestmentGrowth, pct } from "./math";
 import GrowthGraph from "./GrowthGraph";
 import { parseAndShortHandDollars } from "./formatting";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 const useStyles = makeStyles((theme) => ({
   wider: {
@@ -207,9 +208,10 @@ export default function Calculator(props: CalculatorProps) {
         });
       });
   }, [inputs]);
+  const [yourInformationExpanded, setYourInformationExpanded] = useLocalStorage("your_information_expanded", false);
   return (
     <Box>
-      <Accordion defaultExpanded={true}>
+      <Accordion expanded={yourInformationExpanded} onChange={(_, expanded) => setYourInformationExpanded(expanded)}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Grid container spacing={1}>
             <Grid item>
