@@ -2,6 +2,7 @@ import React from "react";
 import { InvestmentGrowth } from "./math";
 import { formatDollars, shortHandDollars } from "./formatting";
 import { ResponsiveLine } from "@nivo/line";
+import { useTheme } from "@material-ui/core/styles";
 
 interface GrowthGraphProps {
   investmentGrowth: InvestmentGrowth[];
@@ -13,6 +14,7 @@ export default function GrowthGraph(props: GrowthGraphProps) {
     return { x: growth.age, y: growth.value };
   });
   const graphMargin = 60;
+  const theme = useTheme();
   return (
     <ResponsiveLine
       data={[{ id: "investment-growth", data: datums }]}
@@ -64,6 +66,29 @@ export default function GrowthGraph(props: GrowthGraphProps) {
           legendOrientation: "horizontal",
         },
       ]}
+      theme={{
+        background: theme.palette.background.default,
+        textColor: theme.palette.text.primary,
+        crosshair: {
+          line: { stroke: theme.palette.text.primary },
+        },
+        axis: { 
+          ticks: { text: { fill: theme.palette.text.primary } },
+        },
+        labels: {
+          text: { fill: theme.palette.text.primary }
+        },
+        markers: {
+          text: { fill: theme.palette.text.primary }
+        },
+        tooltip: {
+          container: { background: theme.palette.background.paper }
+        },
+        legends: {
+          text: { fill: theme.palette.text.primary }
+        }
+      }}
     />
   );
 }
+

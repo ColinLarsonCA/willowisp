@@ -5,6 +5,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import WhatshotIcon from "@material-ui/icons/Whatshot";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
+import Brightness4Icon from "@material-ui/icons/Brightness4";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -20,11 +22,16 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-export default function Header() {
+interface HeaderProps {
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+}
+
+export default function Header(props: HeaderProps) {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <AppBar position="static">
+      <AppBar position="fixed">
         <Toolbar>
           <IconButton
             edge="start"
@@ -36,6 +43,9 @@ export default function Header() {
           <Typography variant="h6" className={classes.title}>
             Retirement Forecasting
           </Typography>
+          <IconButton onClick={props.toggleTheme}>
+            {props.theme === "light" ? <Brightness4Icon/> : <Brightness7Icon/>}
+          </IconButton>
         </Toolbar>
       </AppBar>
     </div>
