@@ -220,8 +220,8 @@ export default function Calculator(props: CalculatorProps) {
                 <span style={{ textDecoration: "overline" }}>
                   {parseAndShortHandDollars(inputs.annualPortfolioContribution)}
                 </span>{" "}
-                compounding at {inputs.annualReturnRate}% and withdrawn at{" "}
-                {inputs.annualWithdrawalRate}%
+                compounding at {inputs.annualReturnRate || "0.00"}% and
+                withdrawn at {inputs.annualWithdrawalRate || "0.00"}%
               </Typography>
             </Grid>
           </Grid>
