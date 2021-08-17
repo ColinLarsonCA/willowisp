@@ -16,11 +16,12 @@ import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
-import { calculateYearsToCoast, calculateInvestmentGrowth, InvestmentGrowth, pct, YearsToCoast } from "./math";
+import { calculateYearsToCoast, calculateInvestmentGrowth, InvestmentGrowth, pct, YearsToCoast, calculatePassiveIncome, PassiveIncome } from "./math";
 import GrowthGraph from "./GrowthGraph";
 import { parseAndShortHandDollars } from "./formatting";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import CoastGraph from "./CoastGraph";
+import PassiveIncomeGraph from "./PassiveIncomeGraph";
 
 const useStyles = makeStyles((theme) => ({
   wider: {
@@ -78,6 +79,7 @@ interface Calculations {
   percentOfRetirementPortfolio: number;
   investmentGrowth: InvestmentGrowth[];
   yearsToCoast: YearsToCoast[];
+  passiveIncome: PassiveIncome[];
 }
 
 export interface CalculatorProps {
@@ -177,6 +179,7 @@ export default function Calculator(props: CalculatorProps) {
       v.annualReturnRate
     )
     const yearsToCoast = calculateYearsToCoast(investmentGrowth, requiredPortfolio, v.annualReturnRate);
+    const passiveIncome = calculatePassiveIncome(investmentGrowth, v.annualWithdrawalRate);
     const calculatedResults: Calculations = {
       inputs: v,
       anyNaNs,
@@ -187,7 +190,8 @@ export default function Calculator(props: CalculatorProps) {
       retirementAgeDifference,
       percentOfRetirementPortfolio,
       investmentGrowth,
-      yearsToCoast
+      yearsToCoast,
+      passiveIncome
     };
     return calculatedResults;
   }, [convertedInputs]);
@@ -469,6 +473,17 @@ export default function Calculator(props: CalculatorProps) {
                 investmentGrowth={results.investmentGrowth}
                 requiredPortfolio={results.requiredPortfolio}
               />
+            </div>
+
+            <Divider className={classes.resultsDivider} />
+            <Typography variant="h6">
+              Passive income growth
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              Over time the annual passive income from your portfolio will grow. This is how it will compare to your expected expenses in retirement, so that you can decide when the right time to retire is.
+            </Typography>
+            <div style={{ height: 500 }}>
+              <PassiveIncomeGraph passiveIncome={results.passiveIncome} annualRetirementExpenses={results.inputs.annualRetirementExpenses} />
             </div>
 
             <Divider className={classes.resultsDivider} />

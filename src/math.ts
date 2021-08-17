@@ -36,3 +36,17 @@ export function calculateYearsToCoast(investmentGrowth: InvestmentGrowth[], requ
   return yearsToCoast;
 }
 
+export interface PassiveIncome {
+  atAge: number;
+  income: number;
+}
+
+export function calculatePassiveIncome(investmentGrowth: InvestmentGrowth[], annualWithdrawalRate: number): PassiveIncome[] {
+  return investmentGrowth.map(year => {
+    return {
+      atAge: year.age,
+      income: year.value * pct(annualWithdrawalRate),
+    }
+  });
+}
+

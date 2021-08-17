@@ -1,23 +1,23 @@
 import React from "react";
-import { InvestmentGrowth } from "./math";
+import { PassiveIncome } from "./math";
 import { formatDollars, shortHandDollars } from "./formatting";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@material-ui/core/styles";
 import { graphMargin } from "./graphs";
 
-interface GrowthGraphProps {
-  investmentGrowth: InvestmentGrowth[];
-  requiredPortfolio: number;
+interface PassiveIncomeGraphProps {
+    passiveIncome: PassiveIncome[];
+    annualRetirementExpenses: number;
 }
 
-export default function GrowthGraph(props: GrowthGraphProps) {
-  const datums = props.investmentGrowth.map((growth) => {
-    return { x: growth.age, y: growth.value };
+export default function PassiveIncomeGraph(props: PassiveIncomeGraphProps) {
+  const datums = props.passiveIncome.map((income) => {
+    return { x: income.atAge, y: income.income };
   });
   const theme = useTheme();
   return (
     <ResponsiveLine
-      data={[{ id: "investment-growth", data: datums }]}
+      data={[{ id: "passive-income", data: datums }]}
       margin={{
         top: graphMargin,
         right: graphMargin,
@@ -52,9 +52,9 @@ export default function GrowthGraph(props: GrowthGraphProps) {
       }}
       axisLeft={{
         format: (value) => {
-          return shortHandDollars(parseFloat(value), 1);
+          return shortHandDollars(parseFloat(value));
         },
-        legend: "Portfolio",
+        legend: "Annual passive income",
         legendPosition: "middle",
         legendOffset: -52,
       }}
@@ -68,9 +68,9 @@ export default function GrowthGraph(props: GrowthGraphProps) {
       markers={[
         {
           axis: "y",
-          value: props.requiredPortfolio,
+          value: props.annualRetirementExpenses,
           lineStyle: { stroke: "#61CDBB", strokeWidth: 2 },
-          legend: `${formatDollars(props.requiredPortfolio, 2)}`,
+          legend: `${formatDollars(props.annualRetirementExpenses, 2)}`,
           legendOrientation: "horizontal",
           textStyle: {
             fill: theme.palette.text.primary,

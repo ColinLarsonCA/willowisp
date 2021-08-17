@@ -1,0 +1,1 @@
+export const graphMargin = 60;

@@ -2,6 +2,7 @@ import React from "react";
 import { YearsToCoast } from "./math";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@material-ui/core/styles";
+import { graphMargin } from "./graphs";
 
 interface CoastGraphProps {
   possibleRetirementAge: number;
@@ -14,7 +15,6 @@ export default function CoastGraph(props: CoastGraphProps) {
   const datums = props.yearsToCoast.map((year) => {
     return { x: year.atAge, y: year.years + props.possibleRetirementAge };
   });
-  const graphMargin = 60;
   const theme = useTheme();
   return (
     <ResponsiveLine
