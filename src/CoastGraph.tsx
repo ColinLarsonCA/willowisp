@@ -1,23 +1,24 @@
 import React from "react";
-import { InvestmentGrowth } from "./math";
-import { formatDollars, shortHandDollars } from "./formatting";
+import { YearsToCoast } from "./math";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@material-ui/core/styles";
 
-interface GrowthGraphProps {
-  investmentGrowth: InvestmentGrowth[];
-  requiredPortfolio: number;
+interface CoastGraphProps {
+  possibleRetirementAge: number;
+  targetRetirementAge: number;
+  yearsToCoast: YearsToCoast[];
 }
 
-export default function GrowthGraph(props: GrowthGraphProps) {
-  const datums = props.investmentGrowth.map((growth) => {
-    return { x: growth.age, y: growth.value };
+export default function CoastGraph(props: CoastGraphProps) {
+  console.log(props);
+  const datums = props.yearsToCoast.map((year) => {
+    return { x: year.atAge, y: year.years + props.possibleRetirementAge };
   });
   const graphMargin = 60;
   const theme = useTheme();
   return (
     <ResponsiveLine
-      data={[{ id: "investment-growth", data: datums }]}
+      data={[{ id: "coast", data: datums }]}
       margin={{
         top: graphMargin,
         right: graphMargin,
@@ -38,27 +39,16 @@ export default function GrowthGraph(props: GrowthGraphProps) {
         stacked: true,
         reverse: false,
       }}
-      yFormat={(datumValue) => {
-        const value = datumValue.valueOf();
-        if (typeof value === "string") {
-          return shortHandDollars(parseFloat(value), 2);
-        }
-        return shortHandDollars(value, 2);
-      }}
       axisBottom={{
-        legend: "Age",
+        legend: "Your age",
         legendPosition: "middle",
         legendOffset: 40,
       }}
       axisLeft={{
-        format: (value) => {
-          return shortHandDollars(parseFloat(value), 1);
-        },
-        legend: "Portfolio",
+        legend: "Retirement age",
         legendPosition: "middle",
         legendOffset: -52,
       }}
-      gridXValues={[]}
       pointSize={10}
       pointColor={{ theme: "background" }}
       pointBorderWidth={2}
@@ -68,14 +58,14 @@ export default function GrowthGraph(props: GrowthGraphProps) {
       markers={[
         {
           axis: "y",
-          value: props.requiredPortfolio,
+          value: props.targetRetirementAge,
           lineStyle: { stroke: "#61CDBB", strokeWidth: 2 },
-          legend: `${formatDollars(props.requiredPortfolio, 2)}`,
+          legend: "Target retirement age: " + props.targetRetirementAge,
           legendOrientation: "horizontal",
           textStyle: {
-            fill: theme.palette.text.primary,
-          },
-        },
+            fill: theme.palette.text.primary
+          }
+        }
       ]}
       theme={{
         background: theme.palette.background.default,

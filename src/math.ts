@@ -1,3 +1,7 @@
+export function pct(percent: number): number {
+  return percent/100.0;
+}
+
 export interface InvestmentGrowth {
   age: number;
   value: number;
@@ -15,6 +19,20 @@ export function calculateInvestmentGrowth(fromAge: number, toAge: number, initia
   return investmentGrowth;
 }
 
-export function pct(percent: number): number {
-  return percent/100.0;
+export interface YearsToCoast {
+  atAge: number;
+  years: number;
 }
+
+export function calculateYearsToCoast(investmentGrowth: InvestmentGrowth[], requiredPortfolio: number, realReturn: number): YearsToCoast[] {
+  const yearsToCoast: YearsToCoast[] = [];
+  investmentGrowth.forEach((year) => {
+    const years = Math.max(Math.ceil(Math.log(requiredPortfolio/year.value)/Math.log(1+pct(realReturn))), 0);
+    yearsToCoast.push({
+      atAge: year.age,
+      years: years
+    })
+  });
+  return yearsToCoast;
+}
+

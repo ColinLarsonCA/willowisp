@@ -16,10 +16,11 @@ import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
-import { calculateInvestmentGrowth, InvestmentGrowth, pct } from "./math";
+import { calculateYearsToCoast, calculateInvestmentGrowth, InvestmentGrowth, pct, YearsToCoast } from "./math";
 import GrowthGraph from "./GrowthGraph";
 import { parseAndShortHandDollars } from "./formatting";
 import { useLocalStorage } from "./hooks/useLocalStorage";
+import CoastGraph from "./CoastGraph";
 
 const useStyles = makeStyles((theme) => ({
   wider: {
@@ -67,6 +68,7 @@ interface Inputs {
 }
 
 interface Calculations {
+  inputs: Inputs;
   anyNaNs: boolean;
   isRetirementPossibleByTargetAge: boolean;
   requiredPortfolio: number;
@@ -75,6 +77,7 @@ interface Calculations {
   retirementAgeDifference: number;
   percentOfRetirementPortfolio: number;
   investmentGrowth: InvestmentGrowth[];
+  yearsToCoast: YearsToCoast[];
 }
 
 export interface CalculatorProps {
@@ -154,7 +157,7 @@ export default function Calculator(props: CalculatorProps) {
     if (yearsToRetirement < 0) {
       yearsToRetirement = 0;
     }
-    const possibleRetirementAge = v.currentAge + yearsToRetirement;
+    const possibleRetirementAge = Math.ceil(v.currentAge + yearsToRetirement);
     const isRetirementPossibleByTargetAge =
       possibleRetirementAge <= v.retirementAge;
     const retirementAgeDifference = possibleRetirementAge - v.retirementAge;
@@ -166,7 +169,16 @@ export default function Calculator(props: CalculatorProps) {
       isNaN(possibleRetirementAge) ||
       isNaN(retirementAgeDifference) ||
       isNaN(percentOfRetirementPortfolio);
+    const investmentGrowth = calculateInvestmentGrowth(
+      v.currentAge,
+      Math.min(v.retirementAge, 100),
+      v.currentPortfolio,
+      v.annualPortfolioContribution,
+      v.annualReturnRate
+    )
+    const yearsToCoast = calculateYearsToCoast(investmentGrowth, requiredPortfolio, v.annualReturnRate);
     const calculatedResults: Calculations = {
+      inputs: v,
       anyNaNs,
       isRetirementPossibleByTargetAge,
       requiredPortfolio,
@@ -174,13 +186,8 @@ export default function Calculator(props: CalculatorProps) {
       possibleRetirementAge,
       retirementAgeDifference,
       percentOfRetirementPortfolio,
-      investmentGrowth: calculateInvestmentGrowth(
-        v.currentAge,
-        Math.min(v.retirementAge, 100),
-        v.currentPortfolio,
-        v.annualPortfolioContribution,
-        v.annualReturnRate
-      ),
+      investmentGrowth,
+      yearsToCoast
     };
     return calculatedResults;
   }, [convertedInputs]);
@@ -209,6 +216,10 @@ export default function Calculator(props: CalculatorProps) {
       });
   }, [inputs]);
   const [yourInformationExpanded, setYourInformationExpanded] = useLocalStorage("your_information_expanded", false);
+  const [growthGraphAgeRange, setGrowthGraphAgeRange] = useState([0, 0]);
+  useEffect(() => {
+    setGrowthGraphAgeRange([results.inputs.currentAge, results.inputs.retirementAge]);
+  }, [results.inputs.currentAge, results.inputs.retirementAge]);
   return (
     <Box>
       <Accordion expanded={yourInformationExpanded} onChange={(_, expanded) => setYourInformationExpanded(expanded)}>
@@ -418,6 +429,7 @@ export default function Calculator(props: CalculatorProps) {
               color="primary"
               onClick={copyLink}
             />
+
             <Divider className={classes.resultsDivider} />
             <Typography variant="h6">
               {results.isRetirementPossibleByTargetAge
@@ -444,15 +456,30 @@ export default function Calculator(props: CalculatorProps) {
                 2
               )}% of what you need to retire. Keep it up!`}
             </Typography>
+
             <Divider className={classes.resultsDivider} />
             <Typography variant="h6">
-              How your investment could grow over time
+              Portfolio growth
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              Based on the information provided this is how your portfolio is expected to grow over time
             </Typography>
             <div style={{ height: 500 }}>
               <GrowthGraph
                 investmentGrowth={results.investmentGrowth}
                 requiredPortfolio={results.requiredPortfolio}
               />
+            </div>
+
+            <Divider className={classes.resultsDivider} />
+            <Typography variant="h6">
+              Coasting potential
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              If you wanted to take a lower stress job or one that required less of your time, but paid less so that you could not contribute to your portfolio anymore, this is how your retirement age could be affected
+            </Typography>
+            <div style={{ height: 500 }}>
+              <CoastGraph possibleRetirementAge={results.possibleRetirementAge} targetRetirementAge={results.inputs.retirementAge} yearsToCoast={results.yearsToCoast} />
             </div>
           </div>
         )}
