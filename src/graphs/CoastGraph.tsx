@@ -1,8 +1,8 @@
 import React from "react";
-import { YearsToCoast } from "./math";
+import { YearsToCoast } from "../math";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@material-ui/core/styles";
-import { graphMargin } from "./graphs";
+import { allMargins, graphMargin, useGraphTheme } from "./graphs";
 
 interface CoastGraphProps {
   possibleRetirementAge: number;
@@ -11,7 +11,6 @@ interface CoastGraphProps {
 }
 
 export default function CoastGraph(props: CoastGraphProps) {
-  console.log(props);
   const datums = props.yearsToCoast.map((year) => {
     return { x: year.atAge, y: year.years + props.possibleRetirementAge };
   });
@@ -19,12 +18,7 @@ export default function CoastGraph(props: CoastGraphProps) {
   return (
     <ResponsiveLine
       data={[{ id: "coast", data: datums }]}
-      margin={{
-        top: graphMargin,
-        right: graphMargin,
-        bottom: graphMargin,
-        left: graphMargin,
-      }}
+      margin={allMargins}
       xScale={{
         type: "linear",
         min: "auto",
@@ -67,28 +61,7 @@ export default function CoastGraph(props: CoastGraphProps) {
           }
         }
       ]}
-      theme={{
-        background: theme.palette.background.default,
-        textColor: theme.palette.text.primary,
-        crosshair: {
-          line: { stroke: theme.palette.text.primary },
-        },
-        axis: { 
-          ticks: { text: { fill: theme.palette.text.primary } },
-        },
-        labels: {
-          text: { fill: theme.palette.text.primary }
-        },
-        markers: {
-          text: { fill: theme.palette.text.primary }
-        },
-        tooltip: {
-          container: { background: theme.palette.background.paper }
-        },
-        legends: {
-          text: { fill: theme.palette.text.primary }
-        }
-      }}
+      theme={useGraphTheme()}
     />
   );
 }

@@ -17,11 +17,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import { calculateYearsToCoast, calculateInvestmentGrowth, InvestmentGrowth, pct, YearsToCoast, calculatePassiveIncome, PassiveIncome } from "./math";
-import GrowthGraph from "./GrowthGraph";
+import GrowthGraph from "./graphs/GrowthGraph";
 import { parseAndShortHandDollars } from "./formatting";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import CoastGraph from "./CoastGraph";
-import PassiveIncomeGraph from "./PassiveIncomeGraph";
+import CoastGraph from "./graphs/CoastGraph";
+import PassiveIncomeGraph from "./graphs/PassiveIncomeGraph";
 
 const useStyles = makeStyles((theme) => ({
   wider: {
