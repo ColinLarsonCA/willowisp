@@ -43,6 +43,7 @@ export default function CoastGraph(props: CoastGraphProps) {
         legendPosition: "middle",
         legendOffset: -52,
       }}
+      gridXValues={[]}
       pointSize={10}
       pointColor={{ theme: "background" }}
       pointBorderWidth={2}
