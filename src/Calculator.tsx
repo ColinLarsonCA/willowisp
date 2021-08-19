@@ -4,12 +4,17 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Card,
+  CardContent,
   Chip,
   Divider,
   Grid,
+  IconButton,
   InputAdornment,
+  Link,
   Snackbar,
   TextField,
+  Tooltip,
   Typography,
 } from "@material-ui/core";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
@@ -22,6 +27,8 @@ import { parseAndShortHandDollars } from "./formatting";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import CoastGraph from "./graphs/CoastGraph";
 import PassiveIncomeGraph from "./graphs/PassiveIncomeGraph";
+import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
+import LearnMoreDialog from "./LearnMoreDialog";
 
 const useStyles = makeStyles((theme) => ({
   wider: {
@@ -42,6 +49,17 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(2),
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
+  },
+  disclaimerContainer: {
+    paddingTop: theme.spacing(2),
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    paddingBottom: theme.spacing(2),
+  },
+  disclaimerContent: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column'
   },
   informationSubtitle: {
     color: theme.palette.text.secondary,
@@ -224,6 +242,7 @@ export default function Calculator(props: CalculatorProps) {
   useEffect(() => {
     setGrowthGraphAgeRange([results.inputs.currentAge, results.inputs.retirementAge]);
   }, [results.inputs.currentAge, results.inputs.retirementAge]);
+  const [explanation, setExplanation] = useState("");
   return (
     <Box>
       <Accordion expanded={yourInformationExpanded} onChange={(_, expanded) => setYourInformationExpanded(expanded)}>
@@ -266,11 +285,17 @@ export default function Calculator(props: CalculatorProps) {
                 className={classes.wider}
                 label={"Age you would like to retire by"}
                 placeholder={"0"}
-                helperText={
-                  showTips
-                    ? "Your actual retirement may be sooner or later based on your financials"
-                    : ""
-                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="Learn about selecting a retirement age">
+                        <IconButton onClick={() => setExplanation("Based on the financials and rates entered we will suggest a potential age when you could retire, as well as forecast the growth of your investments vs your retirement needs to help you plan for the future.")}>
+                          <EmojiObjectsIcon/>
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
+                }}
                 value={inputs.retirementAge}
                 onChange={(event) => {
                   setInputs({ ...inputs, retirementAge: event.target.value });
@@ -294,12 +319,16 @@ export default function Calculator(props: CalculatorProps) {
                   startAdornment: (
                     <InputAdornment position="start">$</InputAdornment>
                   ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="Learn about investment portfolios">
+                        <IconButton onClick={() => setExplanation("Your investment portfolio is the total dollar value of all of your invested money, including: stocks, bonds, mutual funds, ETFs, etc. Assets like houses, rental properties, and vehicles should not be included, however you should consider mortgages, rent, car payments, etc when calculating your expenses in retirement.")}>
+                          <EmojiObjectsIcon/>
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
                 }}
-                helperText={
-                  showTips
-                    ? "Including stocks, bonds, mutual funds, ETFs, etc. Not including investment properties."
-                    : ""
-                }
                 value={inputs.currentPortfolio}
                 onChange={(event) => {
                   setInputs({
@@ -319,11 +348,6 @@ export default function Calculator(props: CalculatorProps) {
                     <InputAdornment position="start">$</InputAdornment>
                   ),
                 }}
-                helperText={
-                  showTips
-                    ? "How much you could save each year assuming your income and expenses were static"
-                    : ""
-                }
                 value={inputs.annualPortfolioContribution}
                 onChange={(event) => {
                   setInputs({
@@ -343,11 +367,6 @@ export default function Calculator(props: CalculatorProps) {
                     <InputAdornment position="start">$</InputAdornment>
                   ),
                 }}
-                helperText={
-                  showTips
-                    ? "How much you expect to spend per year in retirement assuming your expenses were static"
-                    : ""
-                }
                 value={inputs.annualRetirementExpenses}
                 onChange={(event) => {
                   setInputs({
@@ -374,12 +393,16 @@ export default function Calculator(props: CalculatorProps) {
                   startAdornment: (
                     <InputAdornment position="start">%</InputAdornment>
                   ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="Learn about real returns">
+                        <IconButton onClick={() => setExplanation("Real returns are what are earned on an investment after accounting for taxes and inflation. Depending on your portfolio allocation, risk tolerance, and many other factors this will vary. Over a long period of time this will typically average out to 3-7% annually.")}>
+                          <EmojiObjectsIcon/>
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
                 }}
-                helperText={
-                  showTips
-                    ? "This will vary but over a long period of time it will typically average 4-7%"
-                    : ""
-                }
                 value={inputs.annualReturnRate}
                 onChange={(event) => {
                   setInputs({
@@ -398,12 +421,16 @@ export default function Calculator(props: CalculatorProps) {
                   startAdornment: (
                     <InputAdornment position="start">%</InputAdornment>
                   ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="Learn about withdrawal rates">
+                        <IconButton onClick={() => setExplanation("Your withdrawal rate is what percentage of your portfolio you plan to withdraw annually in retirement to meet your expenses. Typically between 2-4% is chosen as a safe withdrawal rate.")}>
+                          <EmojiObjectsIcon/>
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
                 }}
-                helperText={
-                  showTips
-                    ? "Percentage of the portfolio that will be withdrawn to meet your retirement expenses, typically 3-4%"
-                    : ""
-                }
                 value={inputs.annualWithdrawalRate}
                 onChange={(event) => {
                   setInputs({
@@ -499,6 +526,19 @@ export default function Calculator(props: CalculatorProps) {
           </div>
         )}
       </div>
+      <div className={classes.disclaimerContainer}>
+        <Card>
+          <CardContent className={classes.disclaimerContent}>
+            <Typography>
+              {"The Will-o'-Wisp Retirement Forecaster (and "}<Link href="https://willowisp.ca">willowisp.ca</Link>{") is written and maintained by a Canadian software developer and casual investor to aid in his own retirement planning. It is highly recommended that you seek advice from a fiduciary financial advisor when planning for your own retirement."}
+            </Typography>
+            <br/><br/>
+            <Typography>
+              None of the information you enter on this website is saved to an external database, it is only saved locally within your web browser for ease of use.
+            </Typography>
+          </CardContent>
+        </Card>
+      </div>
       <Snackbar
         open={currentAlert.open}
         autoHideDuration={6000}
@@ -511,6 +551,7 @@ export default function Calculator(props: CalculatorProps) {
           {currentAlert.message}
         </Alert>
       </Snackbar>
+      <LearnMoreDialog open={!!explanation} onClose={() => setExplanation("")} explanation={explanation} />
     </Box>
   );
 }
