@@ -22,7 +22,15 @@ import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
-import { calculateYearsToCoast, calculateInvestmentGrowth, InvestmentGrowth, pct, YearsToCoast, calculatePassiveIncome, PassiveIncome } from "./math";
+import {
+  calculateYearsToCoast,
+  calculateInvestmentGrowth,
+  InvestmentGrowth,
+  pct,
+  YearsToCoast,
+  calculatePassiveIncome,
+  PassiveIncome,
+} from "./math";
 import GrowthGraph from "./graphs/GrowthGraph";
 import { parseAndShortHandDollars } from "./formatting";
 import { useLocalStorage } from "./hooks/useLocalStorage";
@@ -64,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
   },
   sliderContainer: {
     flexGrow: 1,
-  }
+  },
 }));
 
 interface RawFormInputs {
@@ -196,9 +204,16 @@ export default function Calculator(props: CalculatorProps) {
       v.currentPortfolio,
       v.annualPortfolioContribution,
       v.annualReturnRate
-    )
-    const yearsToCoast = calculateYearsToCoast(investmentGrowth, requiredPortfolio, v.annualReturnRate);
-    const passiveIncome = calculatePassiveIncome(investmentGrowth, v.annualWithdrawalRate);
+    );
+    const yearsToCoast = calculateYearsToCoast(
+      investmentGrowth,
+      requiredPortfolio,
+      v.annualReturnRate
+    );
+    const passiveIncome = calculatePassiveIncome(
+      investmentGrowth,
+      v.annualWithdrawalRate
+    );
     const calculatedResults: Calculations = {
       inputs: v,
       anyNaNs,
@@ -210,7 +225,7 @@ export default function Calculator(props: CalculatorProps) {
       percentOfRetirementPortfolio,
       investmentGrowth,
       yearsToCoast,
-      passiveIncome
+      passiveIncome,
     };
     return calculatedResults;
   }, [convertedInputs]);
@@ -238,17 +253,30 @@ export default function Calculator(props: CalculatorProps) {
         });
       });
   }, [inputs]);
-  const [yourInformationExpanded, setYourInformationExpanded] = useLocalStorage("your_information_expanded", false);
+  const [yourInformationExpanded, setYourInformationExpanded] = useLocalStorage(
+    "your_information_expanded",
+    false
+  );
   const [growthGraphAgeRange, setGrowthGraphAgeRange] = useState([0, 0]);
-  const [passiveIncomeGrowthAgeRange, setPassiveIncomeGrowthAgeRange] = useState([0, 0]);
+  const [passiveIncomeGrowthAgeRange, setPassiveIncomeGrowthAgeRange] =
+    useState([0, 0]);
   useEffect(() => {
-    setGrowthGraphAgeRange([results.inputs.currentAge, results.inputs.retirementAge]);
-    setPassiveIncomeGrowthAgeRange([results.inputs.currentAge, results.inputs.retirementAge])
+    setGrowthGraphAgeRange([
+      results.inputs.currentAge,
+      results.inputs.retirementAge,
+    ]);
+    setPassiveIncomeGrowthAgeRange([
+      results.inputs.currentAge,
+      results.inputs.retirementAge,
+    ]);
   }, [results.inputs.currentAge, results.inputs.retirementAge]);
   const [explanation, setExplanation] = useState("");
   return (
     <Box>
-      <Accordion expanded={yourInformationExpanded} onChange={(_, expanded) => setYourInformationExpanded(expanded)}>
+      <Accordion
+        expanded={yourInformationExpanded}
+        onChange={(_, expanded) => setYourInformationExpanded(expanded)}
+      >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Grid container spacing={1}>
             <Grid item>
@@ -292,12 +320,18 @@ export default function Calculator(props: CalculatorProps) {
                   endAdornment: (
                     <InputAdornment position="end">
                       <Tooltip title="Learn about selecting a retirement age">
-                        <IconButton onClick={() => setExplanation("Based on the financials and rates entered we will suggest a potential age when you could retire, as well as forecast the growth of your investments vs your retirement needs to help you plan for the future.")}>
-                          <EmojiObjectsIcon/>
+                        <IconButton
+                          onClick={() =>
+                            setExplanation(
+                              "Based on the financials and rates entered we will suggest a potential age when you could retire, as well as forecast the growth of your investments vs your retirement needs to help you plan for the future."
+                            )
+                          }
+                        >
+                          <EmojiObjectsIcon />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
-                  )
+                  ),
                 }}
                 value={inputs.retirementAge}
                 onChange={(event) => {
@@ -325,12 +359,18 @@ export default function Calculator(props: CalculatorProps) {
                   endAdornment: (
                     <InputAdornment position="end">
                       <Tooltip title="Learn about investment portfolios">
-                        <IconButton onClick={() => setExplanation("Your investment portfolio is the total dollar value of all of your invested money, including: stocks, bonds, mutual funds, ETFs, etc. Assets like houses, rental properties, and vehicles should not be included, however you should consider mortgages, rent, car payments, etc when calculating your expenses in retirement.")}>
-                          <EmojiObjectsIcon/>
+                        <IconButton
+                          onClick={() =>
+                            setExplanation(
+                              "Your investment portfolio is the total dollar value of all of your invested money, including: stocks, bonds, mutual funds, ETFs, etc. Assets like houses, rental properties, and vehicles should not be included, however you should consider mortgages, rent, car payments, etc when calculating your expenses in retirement."
+                            )
+                          }
+                        >
+                          <EmojiObjectsIcon />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
-                  )
+                  ),
                 }}
                 value={inputs.currentPortfolio}
                 onChange={(event) => {
@@ -399,12 +439,18 @@ export default function Calculator(props: CalculatorProps) {
                   endAdornment: (
                     <InputAdornment position="end">
                       <Tooltip title="Learn about real returns">
-                        <IconButton onClick={() => setExplanation("Real returns are what are earned on an investment after accounting for taxes and inflation. Depending on your portfolio allocation, risk tolerance, and many other factors this will vary. Over a long period of time this will typically average out to 3-7% annually.")}>
-                          <EmojiObjectsIcon/>
+                        <IconButton
+                          onClick={() =>
+                            setExplanation(
+                              "Real returns are what are earned on an investment after accounting for taxes and inflation. Depending on your portfolio allocation, risk tolerance, and many other factors this will vary. Over a long period of time this will typically average out to 3-7% annually."
+                            )
+                          }
+                        >
+                          <EmojiObjectsIcon />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
-                  )
+                  ),
                 }}
                 value={inputs.annualReturnRate}
                 onChange={(event) => {
@@ -427,12 +473,18 @@ export default function Calculator(props: CalculatorProps) {
                   endAdornment: (
                     <InputAdornment position="end">
                       <Tooltip title="Learn about withdrawal rates">
-                        <IconButton onClick={() => setExplanation("Your withdrawal rate is what percentage of your portfolio you plan to withdraw annually in retirement to meet your expenses. Typically between 2-4% is chosen as a safe withdrawal rate.")}>
-                          <EmojiObjectsIcon/>
+                        <IconButton
+                          onClick={() =>
+                            setExplanation(
+                              "Your withdrawal rate is what percentage of your portfolio you plan to withdraw annually in retirement to meet your expenses. Typically between 2-4% is chosen as a safe withdrawal rate."
+                            )
+                          }
+                        >
+                          <EmojiObjectsIcon />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
-                  )
+                  ),
                 }}
                 value={inputs.annualWithdrawalRate}
                 onChange={(event) => {
@@ -492,11 +544,10 @@ export default function Calculator(props: CalculatorProps) {
             </Typography>
 
             <Divider className={classes.resultsDivider} />
-            <Typography variant="h6">
-              Portfolio growth
-            </Typography>
+            <Typography variant="h6">Portfolio growth</Typography>
             <Typography variant="subtitle1" color="textSecondary">
-              Based on the information provided this is how your portfolio is expected to grow over time
+              Based on the information provided this is how your portfolio is
+              expected to grow over time
             </Typography>
             <Grid container className={classes.growthGraphOptions}>
               <AgeRangeSlider
@@ -510,17 +561,26 @@ export default function Calculator(props: CalculatorProps) {
               <GrowthGraph
                 investmentGrowth={results.investmentGrowth}
                 requiredPortfolio={results.requiredPortfolio}
-                minAge={growthGraphAgeRange.length >= 2 ? growthGraphAgeRange[0] : results.inputs.currentAge}
-                maxAge={growthGraphAgeRange.length >= 2 ? growthGraphAgeRange[1] : results.inputs.retirementAge}
+                minAge={
+                  growthGraphAgeRange.length >= 2
+                    ? growthGraphAgeRange[0]
+                    : results.inputs.currentAge
+                }
+                maxAge={
+                  growthGraphAgeRange.length >= 2
+                    ? growthGraphAgeRange[1]
+                    : results.inputs.retirementAge
+                }
               />
             </div>
 
             <Divider className={classes.resultsDivider} />
-            <Typography variant="h6">
-              Passive income growth
-            </Typography>
+            <Typography variant="h6">Passive income growth</Typography>
             <Typography variant="subtitle1" color="textSecondary">
-              Over time the annual passive income from your portfolio will grow. This is how it will compare to your expected expenses in retirement, so that you can decide when the right time to retire is.
+              Over time the annual passive income from your portfolio will grow.
+              This is how it will compare to your expected expenses in
+              retirement, so that you can decide when the right time to retire
+              is.
             </Typography>
             <Grid container className={classes.passiveIncomeGrowthOptions}>
               <AgeRangeSlider
@@ -533,21 +593,36 @@ export default function Calculator(props: CalculatorProps) {
             <div style={{ height: 500 }}>
               <PassiveIncomeGraph
                 passiveIncome={results.passiveIncome}
-                annualRetirementExpenses={results.inputs.annualRetirementExpenses}
-                minAge={passiveIncomeGrowthAgeRange.length >= 2 ? passiveIncomeGrowthAgeRange[0] : results.inputs.currentAge}
-                maxAge={passiveIncomeGrowthAgeRange.length >= 2 ? passiveIncomeGrowthAgeRange[1] : results.inputs.retirementAge}
+                annualRetirementExpenses={
+                  results.inputs.annualRetirementExpenses
+                }
+                minAge={
+                  passiveIncomeGrowthAgeRange.length >= 2
+                    ? passiveIncomeGrowthAgeRange[0]
+                    : results.inputs.currentAge
+                }
+                maxAge={
+                  passiveIncomeGrowthAgeRange.length >= 2
+                    ? passiveIncomeGrowthAgeRange[1]
+                    : results.inputs.retirementAge
+                }
               />
             </div>
 
             <Divider className={classes.resultsDivider} />
-            <Typography variant="h6">
-              Coasting potential
-            </Typography>
+            <Typography variant="h6">Coasting potential</Typography>
             <Typography variant="subtitle1" color="textSecondary">
-              If you wanted to take a lower stress job or one that required less of your time, but paid less so that you could not contribute to your portfolio anymore, this is how your retirement age could be affected
+              If you wanted to take a lower stress job or one that required less
+              of your time, but paid less so that you could not contribute to
+              your portfolio anymore, this is how your retirement age could be
+              affected
             </Typography>
             <div style={{ height: 500 }}>
-              <CoastGraph possibleRetirementAge={results.possibleRetirementAge} targetRetirementAge={results.inputs.retirementAge} yearsToCoast={results.yearsToCoast} />
+              <CoastGraph
+                possibleRetirementAge={results.possibleRetirementAge}
+                targetRetirementAge={results.inputs.retirementAge}
+                yearsToCoast={results.yearsToCoast}
+              />
             </div>
           </div>
         )}
@@ -558,16 +633,21 @@ export default function Calculator(props: CalculatorProps) {
             <Grid container spacing={2} direction="column">
               <Grid item>
                 <Typography>
-                  {"The Will-o'-Wisp Retirement Forecaster ("}<Link href="https://willowisp.ca">willowisp.ca</Link>{") is written and maintained by a Canadian software developer and casual investor to aid in his own retirement planning. It is highly recommended that you seek advice from a fiduciary financial advisor when planning for your own retirement."}
+                  {"The Will-o'-Wisp Retirement Forecaster ("}
+                  <Link href="https://willowisp.ca">willowisp.ca</Link>
+                  {
+                    ") is written and maintained by a Canadian software developer and casual investor to aid in his own retirement planning. It is highly recommended that you seek advice from a fiduciary financial advisor when planning for your own retirement."
+                  }
                 </Typography>
               </Grid>
               <Grid item>
                 <Typography>
-                  None of the information you enter on this website is saved to an external database, it is only saved locally within your web browser for ease of use.
+                  None of the information you enter on this website is saved to
+                  an external database, it is only saved locally within your web
+                  browser for ease of use.
                 </Typography>
               </Grid>
             </Grid>
-
           </CardContent>
         </Card>
       </div>
@@ -583,7 +663,11 @@ export default function Calculator(props: CalculatorProps) {
           {currentAlert.message}
         </Alert>
       </Snackbar>
-      <LearnMoreDialog open={!!explanation} onClose={() => setExplanation("")} explanation={explanation} />
+      <LearnMoreDialog
+        open={!!explanation}
+        onClose={() => setExplanation("")}
+        explanation={explanation}
+      />
     </Box>
   );
 }
@@ -622,5 +706,5 @@ function AgeRangeSlider(props: AgeRangeSliderProps) {
         />
       </Grid>
     </Grid>
-  )
+  );
 }

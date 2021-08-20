@@ -16,23 +16,23 @@ export function useGraphTheme(): GraphTheme {
       background: theme.palette.background.default,
       textColor: theme.palette.text.primary,
       crosshair: {
-          line: { stroke: theme.palette.text.primary },
+        line: { stroke: theme.palette.text.primary },
       },
       axis: {
-          ticks: { text: { fill: theme.palette.text.primary } },
+        ticks: { text: { fill: theme.palette.text.primary } },
       },
       labels: {
-          text: { fill: theme.palette.text.primary }
+        text: { fill: theme.palette.text.primary },
       },
       markers: {
-          text: { fill: theme.palette.text.primary }
+        text: { fill: theme.palette.text.primary },
       },
       tooltip: {
-          container: { background: theme.palette.background.paper }
+        container: { background: theme.palette.background.paper },
       },
       legends: {
-          text: { fill: theme.palette.text.primary }
-      }
+        text: { fill: theme.palette.text.primary },
+      },
     };
-  }, [theme])
+  }, [theme]);
 }

@@ -13,12 +13,13 @@ interface PassiveIncomeGraphProps {
 }
 
 export default function PassiveIncomeGraph(props: PassiveIncomeGraphProps) {
-  const datums = props.passiveIncome.
-    filter((income) => income.atAge >= props.minAge && income.atAge <= props.maxAge).
-    map((income) => {
+  const datums = props.passiveIncome
+    .filter(
+      (income) => income.atAge >= props.minAge && income.atAge <= props.maxAge
+    )
+    .map((income) => {
       return { x: income.atAge, y: income.income };
-    }
-  );
+    });
   const theme = useTheme();
   return (
     <ResponsiveLine
@@ -81,4 +82,3 @@ export default function PassiveIncomeGraph(props: PassiveIncomeGraphProps) {
     />
   );
 }
-

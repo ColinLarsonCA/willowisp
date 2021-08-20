@@ -58,12 +58,11 @@ export default function CoastGraph(props: CoastGraphProps) {
           legend: "Target retirement age: " + props.targetRetirementAge,
           legendOrientation: "horizontal",
           textStyle: {
-            fill: theme.palette.text.primary
-          }
-        }
+            fill: theme.palette.text.primary,
+          },
+        },
       ]}
       theme={useGraphTheme()}
     />
   );
 }
-

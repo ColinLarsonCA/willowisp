@@ -13,12 +13,13 @@ interface GrowthGraphProps {
 }
 
 export default function GrowthGraph(props: GrowthGraphProps) {
-  const datums = props.investmentGrowth.
-    filter((growth) => growth.age >= props.minAge && growth.age <= props.maxAge).
-    map((growth) => {
+  const datums = props.investmentGrowth
+    .filter(
+      (growth) => growth.age >= props.minAge && growth.age <= props.maxAge
+    )
+    .map((growth) => {
       return { x: growth.age, y: growth.value };
-    }
-  );
+    });
   const theme = useTheme();
   return (
     <ResponsiveLine
@@ -81,4 +82,3 @@ export default function GrowthGraph(props: GrowthGraphProps) {
     />
   );
 }
-

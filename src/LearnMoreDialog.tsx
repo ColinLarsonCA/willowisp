@@ -1,5 +1,10 @@
-import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent } from "@material-ui/core";
+import React from "react";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+} from "@material-ui/core";
 
 export interface LearnMoreDialogProps {
   open: boolean;

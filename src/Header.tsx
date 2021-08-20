@@ -44,7 +44,11 @@ export default function Header(props: HeaderProps) {
             Retirement Forecasting
           </Typography>
           <IconButton onClick={props.toggleTheme}>
-            {props.theme === "light" ? <Brightness4Icon/> : <Brightness7Icon/>}
+            {props.theme === "light" ? (
+              <Brightness4Icon />
+            ) : (
+              <Brightness7Icon />
+            )}
           </IconButton>
         </Toolbar>
       </AppBar>
