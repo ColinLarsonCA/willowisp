@@ -8,12 +8,17 @@ import { allMargins, useGraphTheme } from "./graphs";
 interface PassiveIncomeGraphProps {
   passiveIncome: PassiveIncome[];
   annualRetirementExpenses: number;
+  minAge: number;
+  maxAge: number;
 }
 
 export default function PassiveIncomeGraph(props: PassiveIncomeGraphProps) {
-  const datums = props.passiveIncome.map((income) => {
-    return { x: income.atAge, y: income.income };
-  });
+  const datums = props.passiveIncome.
+    filter((income) => income.atAge >= props.minAge && income.atAge <= props.maxAge).
+    map((income) => {
+      return { x: income.atAge, y: income.income };
+    }
+  );
   const theme = useTheme();
   return (
     <ResponsiveLine

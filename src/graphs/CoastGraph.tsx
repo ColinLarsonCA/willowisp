@@ -2,7 +2,7 @@ import React from "react";
 import { YearsToCoast } from "../math";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@material-ui/core/styles";
-import { allMargins, graphMargin, useGraphTheme } from "./graphs";
+import { allMargins, useGraphTheme } from "./graphs";
 
 interface CoastGraphProps {
   possibleRetirementAge: number;

@@ -12,6 +12,7 @@ import {
   IconButton,
   InputAdornment,
   Link,
+  Slider,
   Snackbar,
   TextField,
   Tooltip,
@@ -31,10 +32,6 @@ import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
 import LearnMoreDialog from "./LearnMoreDialog";
 
 const useStyles = makeStyles((theme) => ({
-  wider: {
-    maxWidth: "300px",
-    width: "100%",
-  },
   separator: {
     height: theme.spacing(2),
   },
@@ -56,14 +53,18 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: theme.spacing(1),
     paddingBottom: theme.spacing(2),
   },
-  disclaimerContent: {
-    display: 'flex',
-    justifyContent: 'center',
-    flexDirection: 'column'
-  },
   informationSubtitle: {
     color: theme.palette.text.secondary,
   },
+  growthGraphOptions: {
+    paddingTop: theme.spacing(2),
+  },
+  passiveIncomeGrowthOptions: {
+    paddingTop: theme.spacing(2),
+  },
+  sliderContainer: {
+    flexGrow: 1,
+  }
 }));
 
 interface RawFormInputs {
@@ -239,8 +240,10 @@ export default function Calculator(props: CalculatorProps) {
   }, [inputs]);
   const [yourInformationExpanded, setYourInformationExpanded] = useLocalStorage("your_information_expanded", false);
   const [growthGraphAgeRange, setGrowthGraphAgeRange] = useState([0, 0]);
+  const [passiveIncomeGrowthAgeRange, setPassiveIncomeGrowthAgeRange] = useState([0, 0]);
   useEffect(() => {
     setGrowthGraphAgeRange([results.inputs.currentAge, results.inputs.retirementAge]);
+    setPassiveIncomeGrowthAgeRange([results.inputs.currentAge, results.inputs.retirementAge])
   }, [results.inputs.currentAge, results.inputs.retirementAge]);
   const [explanation, setExplanation] = useState("");
   return (
@@ -265,13 +268,13 @@ export default function Calculator(props: CalculatorProps) {
           </Grid>
         </AccordionSummary>
         <AccordionDetails>
-          <Grid container justifyContent={"flex-start"} spacing={1}>
+          <Grid container justifyContent={"flex-start"} spacing={2}>
             <Grid item xs={12}>
               <Typography>Ages</Typography>
             </Grid>
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={6}>
               <TextField
-                className={classes.wider}
+                fullWidth
                 label={"Current age"}
                 placeholder={"0"}
                 value={inputs.currentAge}
@@ -280,9 +283,9 @@ export default function Calculator(props: CalculatorProps) {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={6}>
               <TextField
-                className={classes.wider}
+                fullWidth
                 label={"Age you would like to retire by"}
                 placeholder={"0"}
                 InputProps={{
@@ -310,9 +313,9 @@ export default function Calculator(props: CalculatorProps) {
             <Grid item xs={12}>
               <Typography>Financials</Typography>
             </Grid>
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={6}>
               <TextField
-                className={classes.wider}
+                fullWidth
                 label={"Current value of portfolio"}
                 placeholder={"0.00"}
                 InputProps={{
@@ -338,9 +341,9 @@ export default function Calculator(props: CalculatorProps) {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={6}>
               <TextField
-                className={classes.wider}
+                fullWidth
                 label={"Annual contribution to portfolio"}
                 placeholder={"0.00"}
                 InputProps={{
@@ -357,9 +360,9 @@ export default function Calculator(props: CalculatorProps) {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={6}>
               <TextField
-                className={classes.wider}
+                fullWidth
                 label={"Annual expenses in retirement"}
                 placeholder={"0.00"}
                 InputProps={{
@@ -384,9 +387,9 @@ export default function Calculator(props: CalculatorProps) {
             <Grid item xs={12}>
               <Typography>Rates</Typography>
             </Grid>
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={6}>
               <TextField
-                className={classes.wider}
+                fullWidth
                 label={"Annual real return of portfolio"}
                 placeholder={"0.00"}
                 InputProps={{
@@ -412,9 +415,9 @@ export default function Calculator(props: CalculatorProps) {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={6}>
               <TextField
-                className={classes.wider}
+                fullWidth
                 label={"Annual withdrawal rate in retirement"}
                 placeholder={"0.00"}
                 InputProps={{
@@ -495,10 +498,20 @@ export default function Calculator(props: CalculatorProps) {
             <Typography variant="subtitle1" color="textSecondary">
               Based on the information provided this is how your portfolio is expected to grow over time
             </Typography>
+            <Grid container className={classes.growthGraphOptions}>
+              <AgeRangeSlider
+                min={results.inputs.currentAge}
+                max={results.inputs.retirementAge}
+                value={growthGraphAgeRange}
+                onChange={setGrowthGraphAgeRange}
+              />
+            </Grid>
             <div style={{ height: 500 }}>
               <GrowthGraph
                 investmentGrowth={results.investmentGrowth}
                 requiredPortfolio={results.requiredPortfolio}
+                minAge={growthGraphAgeRange.length >= 2 ? growthGraphAgeRange[0] : results.inputs.currentAge}
+                maxAge={growthGraphAgeRange.length >= 2 ? growthGraphAgeRange[1] : results.inputs.retirementAge}
               />
             </div>
 
@@ -509,8 +522,21 @@ export default function Calculator(props: CalculatorProps) {
             <Typography variant="subtitle1" color="textSecondary">
               Over time the annual passive income from your portfolio will grow. This is how it will compare to your expected expenses in retirement, so that you can decide when the right time to retire is.
             </Typography>
+            <Grid container className={classes.passiveIncomeGrowthOptions}>
+              <AgeRangeSlider
+                min={results.inputs.currentAge}
+                max={results.inputs.retirementAge}
+                value={passiveIncomeGrowthAgeRange}
+                onChange={setPassiveIncomeGrowthAgeRange}
+              />
+            </Grid>
             <div style={{ height: 500 }}>
-              <PassiveIncomeGraph passiveIncome={results.passiveIncome} annualRetirementExpenses={results.inputs.annualRetirementExpenses} />
+              <PassiveIncomeGraph
+                passiveIncome={results.passiveIncome}
+                annualRetirementExpenses={results.inputs.annualRetirementExpenses}
+                minAge={passiveIncomeGrowthAgeRange.length >= 2 ? passiveIncomeGrowthAgeRange[0] : results.inputs.currentAge}
+                maxAge={passiveIncomeGrowthAgeRange.length >= 2 ? passiveIncomeGrowthAgeRange[1] : results.inputs.retirementAge}
+              />
             </div>
 
             <Divider className={classes.resultsDivider} />
@@ -528,14 +554,20 @@ export default function Calculator(props: CalculatorProps) {
       </div>
       <div className={classes.disclaimerContainer}>
         <Card>
-          <CardContent className={classes.disclaimerContent}>
-            <Typography>
-              {"The Will-o'-Wisp Retirement Forecaster (and "}<Link href="https://willowisp.ca">willowisp.ca</Link>{") is written and maintained by a Canadian software developer and casual investor to aid in his own retirement planning. It is highly recommended that you seek advice from a fiduciary financial advisor when planning for your own retirement."}
-            </Typography>
-            <br/><br/>
-            <Typography>
-              None of the information you enter on this website is saved to an external database, it is only saved locally within your web browser for ease of use.
-            </Typography>
+          <CardContent>
+            <Grid container spacing={2} direction="column">
+              <Grid item>
+                <Typography>
+                  {"The Will-o'-Wisp Retirement Forecaster ("}<Link href="https://willowisp.ca">willowisp.ca</Link>{") is written and maintained by a Canadian software developer and casual investor to aid in his own retirement planning. It is highly recommended that you seek advice from a fiduciary financial advisor when planning for your own retirement."}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography>
+                  None of the information you enter on this website is saved to an external database, it is only saved locally within your web browser for ease of use.
+                </Typography>
+              </Grid>
+            </Grid>
+
           </CardContent>
         </Card>
       </div>
@@ -558,4 +590,37 @@ export default function Calculator(props: CalculatorProps) {
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+interface AgeRangeSliderProps {
+  min: number;
+  max: number;
+  value: number[];
+  onChange: (newRange: number[]) => void;
+}
+
+function AgeRangeSlider(props: AgeRangeSliderProps) {
+  const classes = useStyles();
+  return (
+    <Grid container item spacing={2} xs={12} md={6} alignItems="center">
+      <Grid item>
+        <Typography variant="subtitle1" color="textSecondary">
+          Age range
+        </Typography>
+      </Grid>
+      <Grid item className={classes.sliderContainer}>
+        <Slider
+          min={props.min}
+          max={props.max}
+          value={props.value}
+          onChange={(_, newRange) => {
+            if (Array.isArray(newRange)) {
+              props.onChange(newRange);
+            }
+          }}
+          valueLabelDisplay="auto"
+        />
+      </Grid>
+    </Grid>
+  )
 }

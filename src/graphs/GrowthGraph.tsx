@@ -3,17 +3,22 @@ import { InvestmentGrowth } from "../math";
 import { formatDollars, shortHandDollars } from "../formatting";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@material-ui/core/styles";
-import { allMargins, graphMargin, useGraphTheme } from "./graphs";
+import { allMargins, useGraphTheme } from "./graphs";
 
 interface GrowthGraphProps {
   investmentGrowth: InvestmentGrowth[];
   requiredPortfolio: number;
+  minAge: number;
+  maxAge: number;
 }
 
 export default function GrowthGraph(props: GrowthGraphProps) {
-  const datums = props.investmentGrowth.map((growth) => {
-    return { x: growth.age, y: growth.value };
-  });
+  const datums = props.investmentGrowth.
+    filter((growth) => growth.age >= props.minAge && growth.age <= props.maxAge).
+    map((growth) => {
+      return { x: growth.age, y: growth.value };
+    }
+  );
   const theme = useTheme();
   return (
     <ResponsiveLine

@@ -2,13 +2,11 @@ import { useTheme } from "@material-ui/core";
 import { Margin, Theme as GraphTheme } from "@nivo/core";
 import { useMemo } from "react";
 
-export const graphMargin = 60;
-
 export const allMargins: Margin = {
-  top: graphMargin,
-  right: graphMargin,
-  bottom: graphMargin,
-  left: graphMargin,
+  top: 30,
+  right: 30,
+  bottom: 60,
+  left: 60,
 };
 
 export function useGraphTheme(): GraphTheme {
