@@ -38,6 +38,7 @@ import CoastGraph from "./graphs/CoastGraph";
 import PassiveIncomeGraph from "./graphs/PassiveIncomeGraph";
 import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
 import LearnMoreDialog from "./LearnMoreDialog";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 const useStyles = makeStyles((theme) => ({
   separator: {
@@ -244,6 +245,7 @@ export default function Calculator(props: CalculatorProps) {
           message: "Link copied to clipboard!",
           severity: "success",
         });
+        logEvent(getAnalytics(), "link_copied", {"data": encoded});
       })
       .catch(() => {
         setCurrentAlert({
