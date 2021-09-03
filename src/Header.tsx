@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) =>
 interface HeaderProps {
   theme: "light" | "dark";
   toggleTheme: () => void;
+  title: string;
 }
 
 export default function Header(props: HeaderProps) {
@@ -41,7 +42,7 @@ export default function Header(props: HeaderProps) {
             <WhatshotIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            Retirement Forecasting
+            {props.title}
           </Typography>
           <IconButton onClick={props.toggleTheme}>
             {props.theme === "light" ? (

@@ -4,14 +4,11 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  Card,
-  CardContent,
   Chip,
   Divider,
   Grid,
   IconButton,
   InputAdornment,
-  Link,
   Slider,
   Snackbar,
   TextField,
@@ -22,6 +19,7 @@ import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
+import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
 import {
   calculateYearsToCoast,
   calculateInvestmentGrowth,
@@ -36,9 +34,9 @@ import { parseAndShortHandDollars } from "./formatting";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import CoastGraph from "./graphs/CoastGraph";
 import PassiveIncomeGraph from "./graphs/PassiveIncomeGraph";
-import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
 import LearnMoreDialog from "./LearnMoreDialog";
 import { getAnalytics, logEvent } from "firebase/analytics";
+import { RouteComponentProps } from "@reach/router";
 
 const useStyles = makeStyles((theme) => ({
   separator: {
@@ -55,12 +53,6 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(2),
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
-  },
-  disclaimerContainer: {
-    paddingTop: theme.spacing(2),
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
-    paddingBottom: theme.spacing(2),
   },
   informationSubtitle: {
     color: theme.palette.text.secondary,
@@ -122,7 +114,9 @@ interface CurrentAlert {
 
 const cacheKey = "retirement_forecasting_inputs";
 
-export default function Calculator(props: CalculatorProps) {
+export default function Calculator(
+  props: CalculatorProps & RouteComponentProps
+) {
   const classes = useStyles();
   const defaultFormInputs: RawFormInputs = {
     currentAge: "21",
@@ -245,7 +239,7 @@ export default function Calculator(props: CalculatorProps) {
           message: "Link copied to clipboard!",
           severity: "success",
         });
-        logEvent(getAnalytics(), "link_copied", {"data": encoded});
+        logEvent(getAnalytics(), "link_copied", { data: encoded });
       })
       .catch(() => {
         setCurrentAlert({
@@ -628,30 +622,6 @@ export default function Calculator(props: CalculatorProps) {
             </div>
           </div>
         )}
-      </div>
-      <div className={classes.disclaimerContainer}>
-        <Card>
-          <CardContent>
-            <Grid container spacing={2} direction="column">
-              <Grid item>
-                <Typography>
-                  {"The Will-o'-Wisp Retirement Forecaster ("}
-                  <Link href="https://willowisp.ca">willowisp.ca</Link>
-                  {
-                    ") is written and maintained by a Canadian software developer and casual investor to aid in his own retirement planning. It is highly recommended that you seek advice from a fiduciary financial advisor when planning for your own retirement."
-                  }
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography>
-                  None of the information you enter on this website is saved to
-                  an external database, it is only saved locally within your web
-                  browser for ease of use.
-                </Typography>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
       </div>
       <Snackbar
         open={currentAlert.open}
