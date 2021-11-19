@@ -39,6 +39,7 @@ import PassiveIncomeGraph from "./graphs/PassiveIncomeGraph";
 import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
 import LearnMoreDialog from "./LearnMoreDialog";
 import { getAnalytics, logEvent } from "firebase/analytics";
+import { useDebounce } from "./hooks/useDebounce";
 
 const useStyles = makeStyles((theme) => ({
   separator: {
@@ -173,7 +174,7 @@ export default function Calculator(props: CalculatorProps) {
     };
     return v;
   }, [inputs]);
-  const results: Calculations = useMemo(() => {
+  const memoizedResults: Calculations = useMemo(() => {
     const v = convertedInputs;
     const requiredPortfolio =
       v.annualRetirementExpenses / pct(v.annualWithdrawalRate);
@@ -230,6 +231,7 @@ export default function Calculator(props: CalculatorProps) {
     };
     return calculatedResults;
   }, [convertedInputs]);
+  const results = useDebounce(memoizedResults, 1000);
   const dollars = Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -521,7 +523,7 @@ export default function Calculator(props: CalculatorProps) {
             <Divider className={classes.resultsDivider} />
             <Typography variant="h6">
               {results.isRetirementPossibleByTargetAge
-                ? `Congratulations, you're on track to retire by ${inputs.retirementAge}! 🎉`
+                ? `Congratulations, you're on track to retire by ${results.inputs.retirementAge}! 🎉`
                 : `Uh oh, it doesn't look like you're going to reach your retirement goal. You'll have to find ways to save more or adjust your expectations to meet it.`}
             </Typography>
             <br />
