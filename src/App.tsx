@@ -41,7 +41,8 @@ export default function App() {
       primary: deepOrange,
       secondary: cyan,
       background: {
-        paper: "#353535",
+        default: "#101418",
+        paper: "#101418",
       },
     },
   });
