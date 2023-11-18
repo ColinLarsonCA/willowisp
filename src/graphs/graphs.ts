@@ -1,5 +1,5 @@
 import { useTheme } from "@material-ui/core";
-import { Margin, Theme as GraphTheme } from "@nivo/core";
+import { Margin, Theme as GraphTheme, TextStyle } from "@nivo/core";
 import { useMemo } from "react";
 
 export const allMargins: Margin = {
@@ -19,19 +19,19 @@ export function useGraphTheme(): GraphTheme {
         line: { stroke: theme.palette.text.primary },
       },
       axis: {
-        ticks: { text: { fill: theme.palette.text.primary } },
+        ticks: { text: { fill: theme.palette.text.primary } as TextStyle },
       },
       labels: {
-        text: { fill: theme.palette.text.primary },
+        text: { fill: theme.palette.text.primary } as TextStyle,
       },
       markers: {
-        text: { fill: theme.palette.text.primary },
+        text: { fill: theme.palette.text.primary } as TextStyle,
       },
       tooltip: {
         container: { background: theme.palette.background.paper },
       },
       legends: {
-        text: { fill: theme.palette.text.primary },
+        text: { fill: theme.palette.text.primary } as TextStyle,
       },
     };
   }, [theme]);
